@@ -4,6 +4,7 @@ import os
 import sys
 import lzma
 from argparse import ArgumentParser
+from collections import deque
 
 AFORM, ALEMMA, ATAGS, AORD, AHEAD, AFUNC = range(6)
 TLEMMA, TFUNC, TORD, THEAD, TYPE, TTAGS = range(6)
@@ -55,6 +56,22 @@ def tree_to_dfs(tree, layer, pos):
         # children -> stack
         for child_ord in top[-1][::-1]:
             stack.append(tree[child_ord])
+
+    return ' '.join(traversal)
+
+def tree_to_bfs(tree, layer, pos):
+    head_pos = HEAD[layer]
+    ord_pos = ORD[layer]
+
+    # root -> queue
+    queue = deque([tree[0]])
+    traversal = []
+    while not queue.empty():
+        top = queue.popleft()
+        traversal.append(top[pos])
+        # children -> queue
+        for child_ord in top[-1]:
+            queue.append(tree[child_ord])
 
     return ' '.join(traversal)
 
