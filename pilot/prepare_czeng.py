@@ -10,8 +10,9 @@ TLEMMA, TFUNC, TORD, THEAD, TYPE, TTAGS = range(6)
 LAYERS = {'a': [AFORM, ALEMMA, ATAGS, AORD, AHEAD, AFUNC],
           't': [TLEMMA, TFUNC, TORD, THEAD, TYPE, TTAGS]}
 HEAD = {'a': AHEAD, 't': THEAD}
+ORD = {'a': AORD, 't': TORD}
 
-def str_to_tree(line, layer):
+def str_to_tree(line, layer, whole=None):
     '''
     Convert str representation of a single tree
     from input files into a list representing
@@ -22,7 +23,7 @@ def str_to_tree(line, layer):
     children_pos = len(feats)
 
     # parse tree
-    root = ['ROOT'] + [''] * (len(feats) - 1) + [[]]
+    root = ['ROOT', 'ROOT'] + [''] * (len(feats) - 2) + [[]]
     tree = [root]
     for token_str in line.split(' '):
         token_feats = token_str.split('|')[:children_pos] + [[]]
@@ -34,6 +35,28 @@ def str_to_tree(line, layer):
         tree[head][children_pos].append(i)
 
     return tree
+
+def tree_to_linear(tree, pos):
+    output = []
+    for token in tree:
+        output.append(token[pos])
+    return ' '.join(output)
+
+def tree_to_dfs(tree, layer, pos):
+    head_pos = HEAD[layer]
+    ord_pos = ORD[layer]
+
+    # root -> stack
+    stack = [tree[0]]
+    traversal = []
+    while stack != []:
+        top = stack.pop()
+        traversal.append(top[pos])
+        # children -> stack
+        for child_ord in top[-1][::-1]:
+            stack.append(tree[child_ord])
+
+    return ' '.join(traversal)
 
 def prepare_data(args, dataset):
     '''
@@ -50,15 +73,13 @@ def prepare_data(args, dataset):
     for file_name in file_list:
         with lzma.open(file_name, 'rt', encoding='utf-8') as in_file:
             for line in in_file:
-                source, target, align = line.strip().split('\t\t')
+                split = line.strip().split('\t')
+                source_a, source_t = split[2:4]
+                target_a, target_t = split[6:8]
 
-                pair_id, score, source_a, source_t, source_a_t = source.split('\t')
                 source_a_tree = str_to_tree(source_a, 'a')
-                source_t_tree = str_to_tree(source_t, 't')
-
-                target_a, tarfet_t, target_a_t = target.split('\t')
                 target_a_tree = str_to_tree(target_a, 'a')
-                target_t_tree = str_to_tree(target_t, 't')
+
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Prepare CZENG data.')
