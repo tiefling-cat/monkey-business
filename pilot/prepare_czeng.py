@@ -41,7 +41,7 @@ def tree_to_linear(tree, pos):
     output = []
     for token in tree:
         output.append(token[pos])
-    return ' '.join(output)
+    return ' '.join(output[1:])
 
 def tree_to_dfs(tree, layer, pos):
     head_pos = HEAD[layer]
@@ -57,7 +57,7 @@ def tree_to_dfs(tree, layer, pos):
         for child_ord in top[-1][::-1]:
             stack.append(tree[child_ord])
 
-    return ' '.join(traversal)
+    return ' '.join(traversal[1:])
 
 def tree_to_bfs(tree, layer, pos):
     head_pos = HEAD[layer]
@@ -66,14 +66,14 @@ def tree_to_bfs(tree, layer, pos):
     # root -> queue
     queue = deque([tree[0]])
     traversal = []
-    while not queue.empty():
+    while len(queue) != 0:
         top = queue.popleft()
         traversal.append(top[pos])
         # children -> queue
         for child_ord in top[-1]:
             queue.append(tree[child_ord])
 
-    return ' '.join(traversal)
+    return ' '.join(traversal[1:])
 
 def prepare_data(args, dataset):
     '''
@@ -87,15 +87,35 @@ def prepare_data(args, dataset):
     file_list = sorted(filter(lambda x: x.endswith('.xz') and dataset in x,
                               os.listdir(args.in_folder)))
 
-    for file_name in file_list:
-        with lzma.open(file_name, 'rt', encoding='utf-8') as in_file:
-            for line in in_file:
-                split = line.strip().split('\t')
-                source_a, source_t = split[2:4]
-                target_a, target_t = split[6:8]
+    source_lin_path = os.path.join(args.out_folder, dataset + '.lin.cz')
+    source_dfs_path = os.path.join(args.out_folder, dataset + '.dfs.cz')
+    source_bfs_path = os.path.join(args.out_folder, dataset + '.bfs.cz')
+    target_path = os.path.join(args.out_folder, dataset + '.en')
 
-                source_a_tree = str_to_tree(source_a, 'a')
-                target_a_tree = str_to_tree(target_a, 'a')
+    with open(source_lin_path, 'w', encoding='utf-8') as source_lin_file,\
+         open(source_dfs_path, 'w', encoding='utf-8') as source_dfs_file,\
+         open(source_bfs_path, 'w', encoding='utf-8') as source_bfs_file,\
+         open(target_path, 'w', encoding='utf-8') as target_file:
+
+        for file_name in file_list:
+            with lzma.open(file_name, 'rt', encoding='utf-8') as in_file:
+                for line in in_file:
+                    split = line.strip().split('\t')
+                    source_a, source_t = split[2:4]
+                    target_a, target_t = split[6:8]
+
+                    source_a_tree = str_to_tree(source_a, 'a')
+                    target_a_tree = str_to_tree(target_a, 'a')
+
+                    # NB: there might not be a t-tree on either side
+                    print(tree_to_linear(source_a_tree, AFORM),
+                          file=source_lin_file)
+                    print(tree_to_linear(target_a_tree, AFORM),
+                          file=target_file)
+                    print(tree_to_dfs(source_a_tree, 'a', AFORM),
+                          file=source_dfs_file)
+                    print(tree_to_bfs(source_a_tree, 'a', AFORM),
+                          file=source_bfs_file)
 
 
 if __name__ == '__main__':
