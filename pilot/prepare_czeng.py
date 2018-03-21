@@ -13,6 +13,8 @@ LAYERS = {'a': [AFORM, ALEMMA, ATAGS, AORD, AHEAD, AFUNC],
 HEAD = {'a': AHEAD, 't': THEAD}
 ORD = {'a': AORD, 't': TORD}
 
+core_args = ('ACT', 'PAT', 'EFF', 'ADDR', 'ORIG')
+
 def str_to_tree(line, layer, whole=None):
     '''
     Convert str representation of a single tree
@@ -75,6 +77,17 @@ def tree_to_bfs(tree, layer, pos):
 
     return ' '.join(traversal[1:])
 
+def t_tree_to_frames(tree):
+    frames = []
+    for token in tree:
+        if token[TFUNC] == 'PRED':
+            frame = token[TLEMMA] + ' | ' +\
+                    ' '.join([tree[child][TLEMMA]
+                              for child in token[-1]
+                              if tree[child][TFUNC] in core_args])
+            frames.append(frame)
+    return ' ; '.join(frames)
+
 def prepare_data(args, dataset):
     '''
     Go through all xz files in input folder,
@@ -105,20 +118,24 @@ def prepare_data(args, dataset):
                     source_a, source_t = split[2:4]
                     target_a, target_t = split[6:8]
 
-                    print(source_t)
-
                     source_a_tree = str_to_tree(source_a, 'a')
                     target_a_tree = str_to_tree(target_a, 'a')
 
-                    # NB: there might not be a t-tree on either side
-                    print(tree_to_linear(source_a_tree, AFORM),
-                          file=source_lin_file)
-                    print(tree_to_linear(target_a_tree, AFORM),
-                          file=target_file)
-                    print(tree_to_dfs(source_a_tree, 'a', AFORM),
-                          file=source_dfs_file)
-                    print(tree_to_bfs(source_a_tree, 'a', AFORM),
-                          file=source_bfs_file)
+                    source_t_tree = str_to_tree(source_t, 't')
+
+                    if len(source_t_tree) != 0:
+                        # there might not be a t-tree on either side
+                        print(tree_to_linear(source_a_tree, AFORM),
+                              file=source_lin_file)
+                        print(tree_to_linear(target_a_tree, AFORM),
+                              file=target_file)
+                        print(tree_to_dfs(source_a_tree, 'a', AFORM),
+                              file=source_dfs_file)
+                        print(tree_to_bfs(source_a_tree, 'a', AFORM),
+                              file=source_bfs_file)
+
+                        frames = t_tree_to_frames(source_t_tree)
+                        print(frames)
 
 
 if __name__ == '__main__':
