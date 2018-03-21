@@ -29,8 +29,9 @@ def str_to_tree(line, layer, whole=None):
     root = ['ROOT', 'ROOT'] + [''] * (len(feats) - 2) + [[]]
     tree = [root]
     for token_str in line.split(' '):
-        token_feats = token_str.split('|')[:children_pos] + [[]]
-        tree.append(token_feats)
+        if token_str != '':
+            token_feats = token_str.split('|')[:children_pos] + [[]]
+            tree.append(token_feats)
 
     # add children
     for i in range(1, len(tree)):
@@ -103,11 +104,13 @@ def prepare_data(args, dataset):
     source_lin_path = os.path.join(args.out_folder, dataset + '.lin.cz')
     source_dfs_path = os.path.join(args.out_folder, dataset + '.dfs.cz')
     source_bfs_path = os.path.join(args.out_folder, dataset + '.bfs.cz')
+    source_fra_path = os.path.join(args.out_folder, dataset + '.fra.cz')
     target_path = os.path.join(args.out_folder, dataset + '.en')
 
     with open(source_lin_path, 'w', encoding='utf-8') as source_lin_file,\
          open(source_dfs_path, 'w', encoding='utf-8') as source_dfs_file,\
          open(source_bfs_path, 'w', encoding='utf-8') as source_bfs_file,\
+         open(source_fra_path, 'w', encoding='utf-8') as source_fra_file,\
          open(target_path, 'w', encoding='utf-8') as target_file:
 
         for file_name in file_list:
@@ -118,24 +121,25 @@ def prepare_data(args, dataset):
                     source_a, source_t = split[2:4]
                     target_a, target_t = split[6:8]
 
-                    source_a_tree = str_to_tree(source_a, 'a')
-                    target_a_tree = str_to_tree(target_a, 'a')
+                    if source_t != '':
 
-                    source_t_tree = str_to_tree(source_t, 't')
+                        source_a_tree = str_to_tree(source_a, 'a')
+                        target_a_tree = str_to_tree(target_a, 'a')
 
-                    if len(source_t_tree) != 0:
-                        # there might not be a t-tree on either side
-                        print(tree_to_linear(source_a_tree, AFORM),
-                              file=source_lin_file)
-                        print(tree_to_linear(target_a_tree, AFORM),
-                              file=target_file)
-                        print(tree_to_dfs(source_a_tree, 'a', AFORM),
-                              file=source_dfs_file)
-                        print(tree_to_bfs(source_a_tree, 'a', AFORM),
-                              file=source_bfs_file)
+                        source_t_tree = str_to_tree(source_t, 't')
 
-                        frames = t_tree_to_frames(source_t_tree)
-                        print(frames)
+                        if len(source_t_tree) != 0:
+                            # there might not be a t-tree on either side
+                            print(tree_to_linear(source_a_tree, AFORM),
+                                  file=source_lin_file)
+                            print(tree_to_linear(target_a_tree, AFORM),
+                                  file=target_file)
+                            print(tree_to_dfs(source_a_tree, 'a', AFORM),
+                                  file=source_dfs_file)
+                            print(tree_to_bfs(source_a_tree, 'a', AFORM),
+                                  file=source_bfs_file)
+                            print(t_tree_to_frames(source_t_tree),
+                                  file=source_fra_file)
 
 
 if __name__ == '__main__':
