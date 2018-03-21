@@ -98,11 +98,14 @@ def prepare_data(args, dataset):
          open(target_path, 'w', encoding='utf-8') as target_file:
 
         for file_name in file_list:
-            with lzma.open(file_name, 'rt', encoding='utf-8') as in_file:
+            file_path = os.path.join(args.in_folder, file_name)
+            with lzma.open(file_path, 'rt', encoding='utf-8') as in_file:
                 for line in in_file:
                     split = line.strip().split('\t')
                     source_a, source_t = split[2:4]
                     target_a, target_t = split[6:8]
+
+                    print(source_t)
 
                     source_a_tree = str_to_tree(source_a, 'a')
                     target_a_tree = str_to_tree(target_a, 'a')
