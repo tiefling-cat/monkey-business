@@ -3,6 +3,7 @@
 import os
 import sys
 import lzma
+import gzip
 from argparse import ArgumentParser
 from collections import deque
 
@@ -95,22 +96,23 @@ def prepare_data(args, in_dataset, out_dataset, offset=0, max_sentence_count=100
     extract the data and output it
     to the respective output files.
     '''
-    if not os.path.exists(args.out_folder):
-        os.makedirs(args.out_folder)
-
-    file_list = sorted(filter(lambda x: x.endswith(dataset + '.xz') and dataset in x,
+    file_list = sorted(filter(lambda x: x.endswith(in_dataset + '.xz'),
                               os.listdir(args.in_folder)))
 
-    source_lin_path = os.path.join(args.out_folder, dataset + '.lin.cz')
-    source_dfs_path = os.path.join(args.out_folder, dataset + '.dfs.cz')
-    source_bfs_path = os.path.join(args.out_folder, dataset + '.bfs.cz')
-    source_fra_path = os.path.join(args.out_folder, dataset + '.fra.cz')
-    target_path = os.path.join(args.out_folder, dataset + '.en')
+    out_folder = os.path.join(args.out_folder, out_dataset)
+    if not os.path.exists(out_folder):
+        os.makedirs(out_folder)
+    
+    source_lin_path = os.path.join(out_folder, 'cz_lin.txt.gz')
+    source_dfs_path = os.path.join(out_folder, 'cz_dfs.txt.gz')
+    source_bfs_path = os.path.join(out_folder, 'cz_bfs.txt.gz')
+    source_fra_path = os.path.join(out_folder, 'cz_fra.txt.gz')
+    target_path = os.path.join(out_folder, 'en.txt.gz')
 
     seen_sentence_count = 0
     output_sentence_count = 0
 
-    with open(source_lin_path, 'w', encoding='utf-8') as source_lin_file,\
+    with lzma.open(source_lin_path, 'w', encoding='utf-8') as source_lin_file,\
          open(source_dfs_path, 'w', encoding='utf-8') as source_dfs_file,\
          open(source_bfs_path, 'w', encoding='utf-8') as source_bfs_file,\
          open(source_fra_path, 'w', encoding='utf-8') as source_fra_file,\
