@@ -89,7 +89,7 @@ def t_tree_to_frames(tree):
             frames.append(frame)
     return ' ; '.join(frames)
 
-def prepare_data(args, dataset):
+def prepare_data(args, dataset, max_sentence_count=1000000):
     '''
     Go through all xz files in input folder,
     extract the data and output it
@@ -98,7 +98,7 @@ def prepare_data(args, dataset):
     if not os.path.exists(args.out_folder):
         os.makedirs(args.out_folder)
 
-    file_list = sorted(filter(lambda x: x.endswith('.xz') and dataset in x,
+    file_list = sorted(filter(lambda x: x.endswith(dataset + '.xz') and dataset in x,
                               os.listdir(args.in_folder)))
 
     source_lin_path = os.path.join(args.out_folder, dataset + '.lin.cz')
@@ -106,6 +106,8 @@ def prepare_data(args, dataset):
     source_bfs_path = os.path.join(args.out_folder, dataset + '.bfs.cz')
     source_fra_path = os.path.join(args.out_folder, dataset + '.fra.cz')
     target_path = os.path.join(args.out_folder, dataset + '.en')
+
+    sentence_count = 0
 
     with open(source_lin_path, 'w', encoding='utf-8') as source_lin_file,\
          open(source_dfs_path, 'w', encoding='utf-8') as source_dfs_file,\
@@ -140,17 +142,23 @@ def prepare_data(args, dataset):
                                   file=source_bfs_file)
                             print(t_tree_to_frames(source_t_tree),
                                   file=source_fra_file)
+                            sentence_count += 1
+                    if sentence_count >= max_sentence_count:
+                        return
 
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Prepare CZENG data.')
     parser.add_argument('-f', '--in-folder', metavar='IN_FOLDER', type=str,
                         action='store', dest='in_folder',
+                        default = '/net/data/czeng17/data.export-format'
                         help='folder with raw data')
     parser.add_argument('-o', '--out-folder', metavar='OUT_FOLDER', type=str,
                         action='store', dest='out_folder',
+                        default='/net/work/people/mediankin/snmt/data/czeng'
                         help='folder for the output')
 
     args = parser.parse_args()
 
-    prepare_data(args, 'train')
+    prepare_data(args, dataset='train', max_sentence_count=1000000)
+    prepare_data(args, dataset='dtest', max_sentence_count=5000)
