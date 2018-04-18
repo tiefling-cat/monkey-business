@@ -89,7 +89,7 @@ def t_tree_to_frames(tree):
             frames.append(frame)
     return ' ; '.join(frames)
 
-def prepare_data(args, dataset, max_sentence_count=1000000):
+def prepare_data(args, in_dataset, out_dataset, offset=0, max_sentence_count=1000000):
     '''
     Go through all xz files in input folder,
     extract the data and output it
@@ -107,7 +107,8 @@ def prepare_data(args, dataset, max_sentence_count=1000000):
     source_fra_path = os.path.join(args.out_folder, dataset + '.fra.cz')
     target_path = os.path.join(args.out_folder, dataset + '.en')
 
-    sentence_count = 0
+    seen_sentence_count = 0
+    output_sentence_count = 0
 
     with open(source_lin_path, 'w', encoding='utf-8') as source_lin_file,\
          open(source_dfs_path, 'w', encoding='utf-8') as source_dfs_file,\
@@ -131,19 +132,22 @@ def prepare_data(args, dataset, max_sentence_count=1000000):
                         source_t_tree = str_to_tree(source_t, 't')
 
                         if len(source_t_tree) != 0:
-                            # there might not be a t-tree on either side
-                            print(tree_to_linear(source_a_tree, AFORM),
-                                  file=source_lin_file)
-                            print(tree_to_linear(target_a_tree, AFORM),
-                                  file=target_file)
-                            print(tree_to_dfs(source_a_tree, 'a', AFORM),
-                                  file=source_dfs_file)
-                            print(tree_to_bfs(source_a_tree, 'a', AFORM),
-                                  file=source_bfs_file)
-                            print(t_tree_to_frames(source_t_tree),
-                                  file=source_fra_file)
-                            sentence_count += 1
-                    if sentence_count >= max_sentence_count:
+                            if seen_sentence_count >= offset:
+                                # there might not be a t-tree on either side
+                                print(tree_to_linear(source_a_tree, AFORM),
+                                      file=source_lin_file)
+                                print(tree_to_linear(target_a_tree, AFORM),
+                                      file=target_file)
+                                print(tree_to_dfs(source_a_tree, 'a', AFORM),
+                                      file=source_dfs_file)
+                                print(tree_to_bfs(source_a_tree, 'a', AFORM),
+                                      file=source_bfs_file)
+                                print(t_tree_to_frames(source_t_tree),
+                                      file=source_fra_file)
+                                output_sentence_count += 1
+                            seen_sentence_count += 1
+
+                    if output_sentence_count >= max_sentence_count:
                         return
 
 
@@ -160,5 +164,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    prepare_data(args, dataset='train', max_sentence_count=1000000)
-    prepare_data(args, dataset='dtest', max_sentence_count=5000)
+    prepare_data(args, in_dataset='train', out_dataset='train', max_sentence_count=1000000)
+    prepare_data(args, in_dataset='dtest', out_dataset='dev', max_sentence_count=2000)
+    prepare_data(args, in_dataset='dtest', out_dataset='test', offset=2000, max_sentence_count=5000)
