@@ -112,11 +112,11 @@ def prepare_data(args, in_dataset, out_dataset, offset=0, max_sentence_count=100
     seen_sentence_count = 0
     output_sentence_count = 0
 
-    with lzma.open(source_lin_path, 'w', encoding='utf-8') as source_lin_file,\
-         open(source_dfs_path, 'w', encoding='utf-8') as source_dfs_file,\
-         open(source_bfs_path, 'w', encoding='utf-8') as source_bfs_file,\
-         open(source_fra_path, 'w', encoding='utf-8') as source_fra_file,\
-         open(target_path, 'w', encoding='utf-8') as target_file:
+    with lzma.open(source_lin_path, 'wt', encoding='utf-8') as source_lin_file,\
+         open(source_dfs_path, 'wt', encoding='utf-8') as source_dfs_file,\
+         open(source_bfs_path, 'wt', encoding='utf-8') as source_bfs_file,\
+         open(source_fra_path, 'wt', encoding='utf-8') as source_fra_file,\
+         open(target_path, 'wt', encoding='utf-8') as target_file:
 
         for file_name in file_list:
             file_path = os.path.join(args.in_folder, file_name)
@@ -161,7 +161,7 @@ if __name__ == '__main__':
                         help='folder with raw data')
     parser.add_argument('-o', '--out-folder', metavar='OUT_FOLDER', type=str,
                         action='store', dest='out_folder',
-                        default='/net/work/people/mediankin/snmt/data/czeng',
+                        default='/net/work/people/mediankin/snmt/data/czeng/pilot',
                         help='folder for the output')
 
     args = parser.parse_args()
