@@ -151,11 +151,11 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Prepare CZENG data.')
     parser.add_argument('-f', '--in-folder', metavar='IN_FOLDER', type=str,
                         action='store', dest='in_folder',
-                        default = '/net/data/czeng17/data.export-format'
+                        default = '/net/data/czeng17/data.export-format',
                         help='folder with raw data')
     parser.add_argument('-o', '--out-folder', metavar='OUT_FOLDER', type=str,
                         action='store', dest='out_folder',
-                        default='/net/work/people/mediankin/snmt/data/czeng'
+                        default='/net/work/people/mediankin/snmt/data/czeng',
                         help='folder for the output')
 
     args = parser.parse_args()
