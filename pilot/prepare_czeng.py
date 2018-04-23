@@ -113,10 +113,10 @@ def prepare_data(args, in_dataset, out_dataset, offset=0, max_sentence_count=100
     output_sentence_count = 0
 
     with lzma.open(source_lin_path, 'wt', encoding='utf-8') as source_lin_file,\
-         open(source_dfs_path, 'wt', encoding='utf-8') as source_dfs_file,\
-         open(source_bfs_path, 'wt', encoding='utf-8') as source_bfs_file,\
-         open(source_fra_path, 'wt', encoding='utf-8') as source_fra_file,\
-         open(target_path, 'wt', encoding='utf-8') as target_file:
+         gzip.open(source_dfs_path, 'wt', encoding='utf-8') as source_dfs_file,\
+         gzip.open(source_bfs_path, 'wt', encoding='utf-8') as source_bfs_file,\
+         gzip.open(source_fra_path, 'wt', encoding='utf-8') as source_fra_file,\
+         gzip.open(target_path, 'wt', encoding='utf-8') as target_file:
 
         for file_name in file_list:
             file_path = os.path.join(args.in_folder, file_name)
