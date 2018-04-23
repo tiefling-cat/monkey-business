@@ -112,7 +112,7 @@ def prepare_data(args, in_dataset, out_dataset, offset=0, max_sentence_count=100
     seen_sentence_count = 0
     output_sentence_count = 0
 
-    with lzma.open(source_lin_path, 'wt', encoding='utf-8') as source_lin_file,\
+    with gzip.open(source_lin_path, 'wt', encoding='utf-8') as source_lin_file,\
          gzip.open(source_dfs_path, 'wt', encoding='utf-8') as source_dfs_file,\
          gzip.open(source_bfs_path, 'wt', encoding='utf-8') as source_bfs_file,\
          gzip.open(source_fra_path, 'wt', encoding='utf-8') as source_fra_file,\
