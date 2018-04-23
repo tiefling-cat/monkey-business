@@ -4,5 +4,5 @@ COMMON=/net/work/people/mediankin/snmt
 DATA=${COMMON}/data/czeng/pilot
 MONKEY=${COMMON}/neuralmonkey
 
-source ${COMMON}/nm/bin/activate
+source ${COMMON}/nmenv/bin/activate
 ${MONKEY}/bin/neuralmonkey-train ${COMMON}/monkey-business/pilot/baseline.ini
