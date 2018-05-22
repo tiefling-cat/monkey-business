@@ -5,7 +5,6 @@ DATA=${COMMON}/data/czeng/pilot
 MONKEY=${COMMON}/neuralmonkey
 
 source ~/.bashrc
-source activate tf15
-#source ${COMMON}/nmenv/bin/activate
-#source /a/merkur3/kocmanek/ANACONDA/envs/tf15/bin/activate
+source activate tf14
+rm -rf /net/work/people/mediankin/snmt/experiments/pilot/baseline
 ${MONKEY}/bin/neuralmonkey-train ${COMMON}/monkey-business/pilot/baseline.ini
